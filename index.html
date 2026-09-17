@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f3dfb8">
+<title>小田貴族｜焼き鳥キャッチ</title>
+<style>
+  :root{
+    --paper:#f3dfb8;
+    --ink:#2b160d;
+    --brown:#6b351e;
+    --brown2:#3a1b10;
+    --red:#bd2b24;
+    --gold:#e2ad4d;
+    --cream:#fff2cf;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;min-height:100%;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif}
+  body{display:flex;justify-content:center}
+  button{font:inherit}
+  .app{width:min(100%,560px);padding:14px 14px 22px}
+  .festival{text-align:center;font-weight:900;letter-spacing:.28em;font-size:11px;color:#8b3328;margin:3px 0 4px}
+  h1{margin:0;text-align:center;font-size:29px;line-height:1.15;letter-spacing:.08em}
+  .subtitle{text-align:center;font-size:12px;margin:7px 0 12px;color:#6e513e}
+  .top-stats{display:flex;justify-content:space-between;align-items:end;padding:0 7px 5px;font-weight:900}
+  .top-stat{font-size:11px;text-align:center}
+  .top-stat strong{display:block;font-size:20px;line-height:1.05}
+  .game-shell{background:#4a2414;border:3px solid #6f3c24;border-radius:18px;padding:7px;box-shadow:0 4px 0 #32170e}
+  .game-header{height:56px;display:grid;grid-template-columns:46px 1fr 46px;gap:8px;align-items:center}
+  .festival-tab{background:linear-gradient(#d94a3b,#a91e19);color:#ffe9c5;border:2px solid #7e1714;border-radius:10px;height:42px;display:grid;place-items:center;font-weight:900;font-size:14px}
+  .sign{height:42px;border:2px solid #8c5c2b;background:linear-gradient(#e7b653,#c78b2d);display:grid;place-items:center;color:#35170c;font-weight:1000;font-size:21px;letter-spacing:.1em;box-shadow:inset 0 0 0 2px #f1d58c}
+  .hud{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:2px 3px 7px}
+  .hudbox{background:rgba(20,13,10,.78);border:1px solid #9c6935;border-radius:10px;padding:5px 8px;text-align:center;color:#f6d889}
+  .hudbox small{display:block;font-size:8px;letter-spacing:.18em}
+  .hudbox strong{font-size:21px;line-height:1}
+  #playfield{
+    position:relative;width:100%;aspect-ratio: .72;
+    max-height:570px;overflow:hidden;border-radius:7px;
+    background:
+      linear-gradient(115deg,rgba(255,255,255,.035),transparent 25%,rgba(255,255,255,.025) 50%,transparent 70%),
+      repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 3px,transparent 3px 38px),
+      repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 3px,transparent 3px 45px),
+      #111;
+    border:1px solid #2b2b2b;
+    touch-action:none;
+  }
+  #playfield:before{
+    content:"";position:absolute;inset:0;pointer-events:none;
+    background:linear-gradient(120deg,transparent 0 36%,rgba(255,255,255,.045) 37% 39%,transparent 40% 62%,rgba(255,176,74,.035) 63% 65%,transparent 66%);
+  }
+  .skewer{position:absolute;z-index:3;width:58px;height:58px;display:grid;place-items:center;font-size:42px;filter:drop-shadow(0 3px 2px rgba(0,0,0,.5));user-select:none}
+  .skewer span{transform:rotate(-22deg);display:block}
+  .catcher{position:absolute;z-index:5;bottom:8px;width:74px;height:62px;display:flex;align-items:center;justify-content:center;font-size:47px;user-select:none;pointer-events:none;filter:drop-shadow(0 2px 2px rgba(0,0,0,.65))}
+  .pop{position:absolute;z-index:8;font-size:19px;font-weight:1000;color:#ffd75f;text-shadow:0 2px 3px #000;pointer-events:none;animation:pop .65s ease-out forwards}
+  @keyframes pop{0%{opacity:0;transform:translateY(8px) scale(.7)}20%{opacity:1}100%{opacity:0;transform:translateY(-35px) scale(1.1)}}
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .control{
+    min-height:58px;border-radius:12px;border:2px solid #8c4a29;
+    background:linear-gradient(#814327,#5d2b18);color:#ffecc5;
+    font-size:30px;font-weight:900;box-shadow:0 3px 0 #35180d;
+    touch-action:manipulation;
+  }
+  .control:active{transform:translateY(2px);box-shadow:0 1px 0 #35180d}
+  .status{
+    width:100%;margin-top:9px;border:2px solid #8e1715;border-radius:11px;
+    background:#be2b25;color:#fff0d1;font-weight:1000;letter-spacing:.08em;
+    min-height:48px;display:grid;place-items:center
+  }
+  .hint{text-align:center;font-size:11px;color:#6d503c;margin:9px 0 0}
+  .overlay{position:absolute;inset:0;z-index:20;background:rgba(8,7,6,.84);display:flex;align-items:center;justify-content:center;padding:22px}
+  .modal{width:min(92%,360px);background:#f8e6bd;border:3px solid #743b20;border-radius:18px;padding:24px 18px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,.35)}
+  .modal h2{margin:0 0 8px;font-size:27px}
+  .modal .big{font-size:52px;font-weight:1000;color:#b32721;line-height:1.05}
+  .modal p{margin:7px 0;color:#634a37;font-size:13px}
+  .start{
+    width:100%;min-height:52px;border:0;border-radius:11px;background:#b72822;color:#fff0d1;
+    font-weight:1000;font-size:18px;margin-top:13px;border-bottom:4px solid #761612
+  }
+  .start:active{transform:translateY(2px);border-bottom-width:2px}
+  .hidden{display:none!important}
+  @media (max-width:390px){
+    .app{padding:10px 9px 18px}
+    h1{font-size:25px}
+    #playfield{aspect-ratio:.74}
+    .control{min-height:54px}
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <div class="festival">CULTURE FESTIVAL</div>
+  <h1>🍢 小田貴族</h1>
+  <div class="subtitle">30秒一本勝負。網の上から焼き鳥を取れ。</div>
+
+  <div class="top-stats">
+    <div class="top-stat">SCORE<strong id="topScore">0</strong></div>
+    <div class="top-stat">TIME<strong id="topTime">30</strong></div>
+  </div>
+
+  <section class="game-shell">
+    <div class="game-header">
+      <div class="festival-tab">祭</div>
+      <div class="sign">小田貴族</div>
+      <div class="festival-tab">祭</div>
+    </div>
+
+    <div class="hud">
+      <div class="hudbox"><small>SCORE</small><strong id="score">0</strong></div>
+      <div class="hudbox"><small>TIME</small><strong id="time">30</strong></div>
+    </div>
+
+    <div id="playfield" aria-label="焼き鳥キャッチゲーム">
+      <div id="catcher" class="catcher">🍽️</div>
+      <div id="overlay" class="overlay">
+        <div class="modal">
+          <h2>焼き鳥キャッチ</h2>
+          <div class="big">30秒</div>
+          <p>左右に動いて、落ちてくる焼き鳥をキャッチ！<br>1本キャッチで <b>+5</b> 点。</p>
+          <p>後半ほど焼き鳥が速くなる！</p>
+          <button id="startBtn" class="start" type="button">ゲームスタート</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="leftBtn" class="control" type="button" aria-label="左へ">←</button>
+      <button id="rightBtn" class="control" type="button" aria-label="右へ">→</button>
+    </div>
+    <div id="status" class="status">READY</div>
+  </section>
+  <div class="hint">スマホは下のボタン、キーボードは ← → で操作できます。</div>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const field = document.getElementById("playfield");
+  const catcher = document.getElementById("catcher");
+  const overlay = document.getElementById("overlay");
+  const startBtn = document.getElementById("startBtn");
+  const scoreEl = document.getElementById("score");
+  const timeEl = document.getElementById("time");
+  const topScoreEl = document.getElementById("topScore");
+  const topTimeEl = document.getElementById("topTime");
+  const statusEl = document.getElementById("status");
+  const leftBtn = document.getElementById("leftBtn");
+  const rightBtn = document.getElementById("rightBtn");
+
+  const GAME_SECONDS = 30;
+  const POINTS = 5;
+  const BASE_SPEED = 115;
+  const SPEED_RAMP = 4.2;
+  const MAX_ITEMS = 7;
+
+  let score = 0;
+  let remaining = GAME_SECONDS;
+  let running = false;
+  let playerX = 0.5;
+  let lastTime = 0;
+  let spawnTimer = 0;
+  let secondTimer = 0;
+  let raf = 0;
+  let items = [];
+  let moveLeft = false;
+  let moveRight = false;
+
+  function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+  function updateHud() {
+    scoreEl.textContent = String(score);
+    topScoreEl.textContent = String(score);
+    timeEl.textContent = String(Math.max(0, Math.ceil(remaining)));
+    topTimeEl.textContent = String(Math.max(0, Math.ceil(remaining)));
+  }
+
+  function placeCatcher() {
+    const w = field.clientWidth;
+    const cw = catcher.offsetWidth || 74;
+    const x = clamp(playerX * w - cw / 2, 0, Math.max(0, w - cw));
+    catcher.style.left = x + "px";
+  }
+
+  function moveBy(amount) {
+    if (!running) return;
+    playerX = clamp(playerX + amount, 0.06, 0.94);
+    placeCatcher();
+  }
+
+  function makeItem() {
+    if (!running || items.length >= MAX_ITEMS) return;
+    const el = document.createElement("div");
+    el.className = "skewer";
+    el.innerHTML = "<span>🍢</span>";
+    const width = field.clientWidth;
+    const x = Math.random() * Math.max(1, width - 58);
+    const y = -58;
+    const speed = BASE_SPEED + (GAME_SECONDS - remaining) * SPEED_RAMP + Math.random() * 42;
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    field.appendChild(el);
+    items.push({ el, x, y, speed, caught:false });
+  }
+
+  function popText(x, y) {
+    const p = document.createElement("div");
+    p.className = "pop";
+    p.textContent = "+5";
+    p.style.left = x + "px";
+    p.style.top = y + "px";
+    field.appendChild(p);
+    setTimeout(() => p.remove(), 700);
+  }
+
+  function removeItem(item) {
+    if (item.el && item.el.parentNode) item.el.remove();
+  }
+
+  function catchCheck(item) {
+    const fw = field.clientWidth;
+    const fh = field.clientHeight;
+    const cw = catcher.offsetWidth || 74;
+    const ch = catcher.offsetHeight || 62;
+    const catcherX = clamp(playerX * fw - cw / 2, 0, fw - cw);
+    const catcherY = fh - ch - 8;
+    const itemW = 58, itemH = 58;
+    return item.x + itemW * .75 > catcherX &&
+           item.x + itemW * .25 < catcherX + cw &&
+           item.y + itemH > catcherY + 12 &&
+           item.y < catcherY + ch;
+  }
+
+  function endGame() {
+    running = false;
+    cancelAnimationFrame(raf);
+    moveLeft = moveRight = false;
+    statusEl.textContent = "GAME OVER";
+    const title =
+      score >= 150 ? "焼き鳥将軍" :
+      score >= 100 ? "焼き鳥名人" :
+      score >= 60 ? "焼き鳥職人" :
+      score >= 30 ? "焼き鳥上手" : "焼き鳥見習い";
+
+    overlay.classList.remove("hidden");
+    overlay.querySelector(".modal").innerHTML = `
+      <h2>お疲れさま！</h2>
+      <div class="big">${score}<small style="font-size:20px"> 点</small></div>
+      <p><b>${title}</b></p>
+      <p>30秒間で ${Math.floor(score / POINTS)} 本キャッチ！</p>
+      <button id="restartBtn" class="start" type="button">もう一度プレイ</button>
+    `;
+    document.getElementById("restartBtn").addEventListener("click", startGame, { once:true });
+  }
+
+  function gameLoop(now) {
+    if (!running) return;
+    if (!lastTime) lastTime = now;
+    const dt = Math.min(0.033, (now - lastTime) / 1000);
+    lastTime = now;
+
+    remaining -= dt;
+    secondTimer += dt;
+    spawnTimer += dt;
+
+    const spawnInterval = Math.max(0.28, 0.72 - (GAME_SECONDS - remaining) * 0.012);
+    if (spawnTimer >= spawnInterval) {
+      spawnTimer = 0;
+      makeItem();
+    }
+
+    if (secondTimer >= 0.1) {
+      secondTimer = 0;
+      updateHud();
+    }
+
+    const horizontal = (moveRight ? 1 : 0) - (moveLeft ? 1 : 0);
+    if (horizontal !== 0) {
+      playerX = clamp(playerX + horizontal * dt * 0.95, 0.06, 0.94);
+      placeCatcher();
+    }
+
+    for (let i = items.length - 1; i >= 0; i--) {
+      const item = items[i];
+      item.y += item.speed * dt;
+      item.el.style.top = item.y + "px";
+
+      if (catchCheck(item)) {
+        score += POINTS;
+        popText(item.x + 18, item.y);
+        removeItem(item);
+        items.splice(i, 1);
+        continue;
+      }
+
+      if (item.y > field.clientHeight + 65) {
+        removeItem(item);
+        items.splice(i, 1);
+      }
+    }
+
+    if (remaining <= 0) {
+      remaining = 0;
+      updateHud();
+      endGame();
+      return;
+    }
+
+    raf = requestAnimationFrame(gameLoop);
+  }
+
+  function startGame() {
+    items.forEach(removeItem);
+    items = [];
+    score = 0;
+    remaining = GAME_SECONDS;
+    playerX = 0.5;
+    running = true;
+    lastTime = 0;
+    spawnTimer = 0;
+    secondTimer = 0;
+    overlay.classList.add("hidden");
+    statusEl.textContent = "PLAYING…";
+    updateHud();
+    placeCatcher();
+    makeItem();
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(gameLoop);
+  }
+
+  function bindHold(button, direction) {
+    const down = (e) => { e.preventDefault(); if (direction === -1) moveLeft = true; else moveRight = true; };
+    const up = () => { if (direction === -1) moveLeft = false; else moveRight = false; };
+    button.addEventListener("pointerdown", down);
+    button.addEventListener("pointerup", up);
+    button.addEventListener("pointercancel", up);
+    button.addEventListener("pointerleave", up);
+  }
+
+  bindHold(leftBtn, -1);
+  bindHold(rightBtn, 1);
+
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowLeft") { e.preventDefault(); moveLeft = true; }
+    if (e.key === "ArrowRight") { e.preventDefault(); moveRight = true; }
+    if (e.key === " " && !running) { e.preventDefault(); startGame(); }
+  });
+  window.addEventListener("keyup", (e) => {
+    if (e.key === "ArrowLeft") moveLeft = false;
+    if (e.key === "ArrowRight") moveRight = false;
+  });
+  window.addEventListener("resize", placeCatcher);
+  startBtn.addEventListener("click", startGame);
+
+  updateHud();
+  placeCatcher();
+})();
+</script>
+</body>
+</html>
